@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-﻿(function () {
+(function () {
     EntitizeNamespace = {
         types: {},
         settings: {}
     };
 
-    // pass the Entitize function a deserialized object, and
+    // pass the Entitize function a serialized object, and
     // the entityType as defined in the settings
     Entitize = function (jsObject, entitytype) {
 
@@ -36,57 +36,60 @@ SOFTWARE.
             return jEntity;
         }
 
-        this.reentitize = function () {
+        this.entitize = function () {
+            // the accumulator 
             var objToSave = {};
+            // the object mappings based on the entityType
             var mappings = EntitizeNamespace.settings[this.entityType];
 
             // loop through each property mapping, checking each one first
-            // to see if there is a nav property defined on it 
+            // to see if there is a nav property defined for it 
             for (var prop in mappings) {
                 var mapping = mappings[prop];
-                // if nav property, we want to build this same type of 
-                // object to send back to the server
+                // if nav = true, we need to recurse on the child 
+                // object(s) by calling entitize() on them, storing 
+                // the results as we go
                 if (mapping.nav) {
                     // get the relationship
-                    var relation = mapping.relationship;
-                    if (relation === "one-to-many") {
-                        // one to many relationship, the nav property must be an array
-                        // store the array in objsToPrep
-                        var objsToPrep = this[mapping.propName];
-
+                    var relationship = mapping.relationship;
+                    if (relationship === "one-to-many") {
+                        // one to many relationship, the nav property must be of
+                        // type array. copy the array into navChildren
+                        var navChildren = this[mapping.propName];
                         // clear out property, store new objects here
                         objToSave[mapping.propName] = [];
-                        // loop through it and prepare each item in 
-                        // the array by recursing, adding to objToSave[mapping.propName]
-                        // as we go
-                        for (var prop in objsToPrep) {
-                            var obj = objsToPrep[prop].reentitize();
+
+                        // loop through each child object in the array
+                        // of children, entitizing each one along the way
+                        // and storing them in the objToSave array
+                        for (var prop in navChildren) {
+                            var obj = navChildren[prop].entitize();
                             objToSave[mapping.propName].push(obj);
                         }
-                    } else if (relation === "one-to-one") {
+                    } else if (relationship === "one-to-one") {
                         // the relationship is one to one, save the individual 
                         // object, if it exists
                         if (this[mapping.propName]) {
-                            objToSave[mapping.propName] = this[mapping.propName].reentitize();
+                            objToSave[mapping.propName] = this[mapping.propName].entitize();
                         } else {
                             // todo?? how to handle deletion of objects
                             objToSave[mapping.propName] = null;
                         }
                     }
                 } else {
-                    // there is no nav property defined, copy the value type to the object
-                    // we are returning
+                    // there is no nav property defined, copy the value type to the
+                    // object being returned
                     objToSave[mapping.propName] = this[mapping.propName];
                 }
             }
 
+            // finally, return the object we were accumulating
             return objToSave;
         }
 
         // todo, callback to server to save entity
         this.save = function () {
-            var objToSend = this.reentitize();
-            //  $.post("/Tables/UpdateTable", { tableJson: objToSend });
+            var objToSend = this.entitize();
 
             var r = new XMLHttpRequest();
             r.open("POST", this.updateUrl, true);
@@ -118,6 +121,8 @@ SOFTWARE.
         return EntitizeNamespace;
     }
 
+    // extends all of the properties and functions
+    // from object => target if object.hasOwnProp
     Entitize.extend = function (target, object) {
         for (var prop in object) {
             if (object.hasOwnProperty(prop)) {
@@ -126,11 +131,14 @@ SOFTWARE.
         }
     }
 
+    // extends all of the properties and functions from
+    // object => all objects that have been created or will be
+    // created with the given entityType
     Entitize.extendType = function (entityType, object) {
         Entitize.extend(EntitizeNamespace.types[entityType], object);
     }
 
-    // JEntity Base Constructor. Everything is a JEntity.
+    // JEntity Base Constructor. Every object is a JEntity.
     // Configure the new object we are creating based on the 
     // mappings for that object
     JEntity = function (jsObject, entityType) {
@@ -162,10 +170,6 @@ SOFTWARE.
                     var entitized = Entitize(entitizeMe, childType);
                     jsObject[navProp] = entitized;
                 }
-            } else {
-                if (jsObject.hasOwnProperty(mapping.propName)) {
-                    this[mapping.propName] = jsObject[mapping.propName];
-                }
             }
         }
 
@@ -179,7 +183,7 @@ SOFTWARE.
 
 })();
 
-/*
+/*  Usage: 
 
 <script src="~/Scripts/entitize/entitize.js"></script>
 
