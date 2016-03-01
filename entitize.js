@@ -87,21 +87,6 @@ SOFTWARE.
             // finally, return the object we were accumulating
             return objToSave;
         }
-
-        // todo, callback to server to save entity
-        this.save = function () {
-            var objToSend = this.entitize();
-
-            var r = new XMLHttpRequest();
-            r.open("POST", this.updateUrl, true);
-            r.setRequestHeader('Content-Type', 'application/json');
-            r.onreadystatechange = function () {
-                if (r.readyState != 4 || r.status != 200) return;
-                console.log(r.responseText);
-            };
-
-            r.send(JSON.stringify(objToSend));
-        }
     }
 
     // initialize with constructors OR settings object
