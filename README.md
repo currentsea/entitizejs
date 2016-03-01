@@ -64,8 +64,9 @@ Foo = function() {
         console.log(this);
     }
 }
+
 ...
-// Define constructors for related types
+// Define constructors for related types (Bar & Baz)
 ...
 ```
 ```javascript
