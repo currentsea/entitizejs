@@ -20,6 +20,7 @@ public class Foo
     public string Name { get; set; }
     public int Age { get; set; }
     public List<Bar> Bars { get; set; }
+    public Baz TheBaz { get; set; }
 }
 
 /// <summary>
@@ -55,13 +56,17 @@ Foo = function() {
     this.mappings = [{propType:"int", propName:"FooId"},
                      {propType:"string", propName:"Name"},
                      {propType:"int", propName:"Age"},
-                     {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"}];
+                     {propType:"Array", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"},
+                     {propType:"Baz", propName:"TheBaz", nav:true, relationship:"one-to-one", childType:"Baz"}];
     
     // Define a function for all instances of Foo
     this.fooFunc = function() {
         console.log(this);
     }
 }
+...
+// Define constructors for related types
+...
 ```
 ```javascript
 // Initialize the constructor with Entitize
