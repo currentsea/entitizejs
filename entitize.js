@@ -114,10 +114,27 @@ SOFTWARE.
         } else {
             var types = {};
             for (var type in settings) {
-                types[type] = new Entitize();
+                if (typeof (settings[type]) === 'function') {
+                    var mappingContructor = settings[type];
+                    var baseObj = new mappingContructor();
+                    baseObj.__proto__ = new Entitize();
+                    EntitizeNamespace.types[baseObj.type] = baseObj;
+                    EntitizeNamespace.settings[baseObj.type] = baseObj.mappings;
+                } else if (typeof (settings[type]) === 'object') {
+                    var mappings = settings[type];
+                    for (var prop in mappings) {
+                        if (isArrayLike(mappings[prop])) {
+                            var dynamicConstructor = eval(prop + " = function() { }")
+                            var baseObj = new dynamicConstructor();
+                            baseObj.type = prop;
+                            baseObj.mappings = mappings;
+                            baseObj.__proto__ = new Entitize();
+                            EntitizeNamespace.types[baseObj.type] = baseObj;
+                            EntitizeNamespace.settings[baseObj.type] = baseObj.mappings[baseObj.type];
+                        }
+                    }
+                }
             }
-            EntitizeNamespace.settings = settings;
-            EntitizeNamespace.types = types;
         }
         return EntitizeNamespace;
     }
@@ -138,6 +155,10 @@ SOFTWARE.
     Entitize.extendType = function (entityType, object) {
         Entitize.extend(EntitizeNamespace.types[entityType], object);
     }
+
+    var isArrayLike = function (obj) {
+        return obj && typeof obj === "object" && (obj.length === 0 || typeof obj.length === "number" && obj.length > 0 && obj.length - 1 in obj);
+    };
 
     // JEntity Base Constructor. Every object is a JEntity.
     // Configure the new object we are creating based on the 
@@ -181,99 +202,4 @@ SOFTWARE.
         // set the proto to the base object as all other types
         this.__proto__ = EntitizeNamespace.types[this.entityType];
     }
-
 })();
-
-/*  Usage
-<script type="text/javascript">
-
-    var jsFoo = @Html.Raw(JsonConvert.SerializeObject(Model,
-    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-
-var mappings = {
-    Foo: [{propType:"int", propName:"FooId"},
-            {propType:"string", propName:"Name"},
-            {propType:"int", propName:"Age"},
-            {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"}],
-
-    Bar: [{propType:"int", propName:"BarId"},
-            {propType:"int", propName:"BazId"},
-            {propType:"Baz", propName:"Baz", nav:true, relationship:"one-to-one", foreignKey:"BazId", childType:"Baz"},
-            {propType:"string", propName:"Value"}],
-
-    Baz: [{propType:"int", propName:"BazId"},
-            {propType:"string", propName:"BazName"}],
-};
-
-Entitize.initialize(mappings);
-
-var jEntityFoo = Entitize(jsFoo, "Foo");
-console.log(jEntityFoo);
-
-var fooFuncs = {
-    fooOne: function() { console.log(this) },
-    fooToo: function() { console.log(this) }
-}
-
-var barFuncs = {
-    barOne: function() { console.log(this) },
-    barTwo: function() { console.log(this) }
-}
-
-Entitize.extendType("Foo", fooFuncs);
-Entitize.extendType("Bar", barFuncs);
-
-////////////////////////////////// OR ////////////////////////////////// 
-
-var jsFoo2 = @Html.Raw(JsonConvert.SerializeObject(Model,
-    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-
-Foo = function() {
-    this.type = "Foo";
-    this.updateUrl = "/FooBarBaz/UpdateFoo";
-    this.mappings = [ {propType:"int", propName:"FooId"},
-                        {propType:"string", propName:"Name"},
-                        {propType:"int", propName:"Age"},
-                        {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"} ];
-
-    this.fooFunc = function() {
-        console.log(this);
-    }
-}
-
-Bar = function() {
-    this.type = "Bar";
-    this.updateUrl = "/FooBarBaz/UpdateBar";
-    this.mappings = [{propType:"int", propName:"BarId"},
-                        {propType:"int", propName:"BazId"},
-                        {propType:"Baz", propName:"Baz", nav:true, relationship:"one-to-one", foreignKey:"BazId", childType:"Baz"},
-                        {propType:"string", propName:"Value"} ];
-
-    this.barFunc = function() {
-        console.log(this);
-    }
-}
-
-Baz = function() {
-    this.type = "Baz";
-    this.updateUrl = "/FooBarBaz/UpdateBaz";
-    this.mappings = [ {propType:"int", propName:"BazId"},
-                        {propType:"string", propName:"BazName"} ];
-}
-
-Entitize.initialize(Foo);
-Entitize.initialize(Bar);
-Entitize.initialize(Baz);
-
-var jsEntityFoo2 = Entitize(jsFoo2, "Foo");
-console.log(jsEntityFoo2);
-
-var barFuncs = {
-    barOne: function() { console.log(this) },
-    barTwo: function() { console.log(this) }
-}
-
-Entitize.extendType("Bar", barFuncs);
-
-</script>
-*/
