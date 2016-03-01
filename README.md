@@ -2,10 +2,11 @@
 A JavaScript library that helps turn domain models into rich JavaScript objects
 <br />
 <br />
-the main function of the library is to map domain model objects from the server, to rich JavaScript objects on the client.
-entitizejs provides an interface to easily define mappings for objects, and relationships between those objects if they exist.
-by defining a custom constructor for your object, it is easy to initialize it with the Entitize framework by calling Entitize.initialize(constructor). This sets up the constructor function that is used for all objects of this constructors type.
-easily persist them back to the server with only it's original props!
+The main function of the library is to map domain model objects from the server, to rich JavaScript objects on the client.
+<b>entitizejs</b> provides an interface to easily define mappings for objects, and relationships between those objects if they exist.
+By defining a custom constructor for your object, it is easy to initialize it with the Entitize framework by calling Entitize.initialize(constructor). This sets up the constructor function that is used for all objects of this constructors type.
+In this constructor, there are three required properties: type, updateUrl, and mappings. Furthermore you can define extra properties and functions here specifically related to that type of object. (dont worry, you can also extend props and funcs later on at any time)
+By defining the updateUrl, it is very easy to persist the object back to the server by calling object.save(). This will post the object to the server, formatting it based on the mappings defined for that object. (it will only take those properties defined)
 <br />
 <br />
 <strong>Server</strong>
