@@ -30,8 +30,9 @@ public class Foo
 [HttpPost]
 public ActionResult UpdateFoo(Foo foo)
 {
-    // Pesrist foo to data store
+    // Do work with foo
     
+    // Return appropriate response
     return new HttpStatusCodeResult(HttpStatusCode.OK);
 }
 ```
