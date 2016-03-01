@@ -1,6 +1,9 @@
 # entitizejs
 A JavaScript library that helps turn domain models into rich JavaScript objects
-
+<br />
+<br />
+The main function of the library is to map domain model objects from the server, to rich JavaScript objects on the client! And then to provide an interface to easily add properties and functions to the client side object, and easily persist them back to the server with only it's original props!
+<br />
 <br />
 <strong>Server</strong>
 ```C#
