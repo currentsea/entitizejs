@@ -69,3 +69,17 @@ jsEntityFoo.fooFunc() //=> calls the function defined in Foo's constructor
 jsEntityFoo.entitize() //=> returns the object prepared for the server (as defined in mappings)
 jsEntityFoo.save() //=> calls entitize() on the object, and posts it to obj.updateUrl
 ```
+```javascript
+// Define more functions for Foo type
+var moreFooStuff = {
+    fooOne: function() { console.log(this) },
+    fooToo: function() { console.log(this) },
+    fooPropOne: "Kung-Foo!"
+}
+
+// Extend the 'moreFooStuff' into the type 'Foo'
+Entitize.extendType("Foo", moreFooStuff);
+
+// Entend the 'moreFooStuff' into the object 'jsEntityFoo'
+Entitize.extend(jsEntityFoo, moreFooStuff);
+```
