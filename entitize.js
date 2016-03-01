@@ -92,8 +92,11 @@ SOFTWARE.
     // initialize with constructors OR settings object
     Entitize.initialize = function (settings) {
         if (typeof (settings) === 'function') {
-            var baseObj = new settings();
-            baseObj.__proto__ = new Entitize();
+            var constructor = settings;
+            constructor.prototype = new Entitize();
+            constructor.prototype.constructor = constructor;
+            var baseObj = new constructor();
+            //baseObj.__proto__ = new Entitize();
             EntitizeNamespace.types[baseObj.type] = baseObj;
             EntitizeNamespace.settings[baseObj.type] = baseObj.mappings;
         } else {
@@ -101,8 +104,10 @@ SOFTWARE.
             for (var type in settings) {
                 if (typeof (settings[type]) === 'function') {
                     var mappingContructor = settings[type];
+                    mappingContructor.prototype = new Entitize();
+                    mappingContructor.prototype.constructor = mappingContructor;
                     var baseObj = new mappingContructor();
-                    baseObj.__proto__ = new Entitize();
+                    //baseObj.__proto__ = new Entitize();
                     EntitizeNamespace.types[baseObj.type] = baseObj;
                     EntitizeNamespace.settings[baseObj.type] = baseObj.mappings;
                 } else if (typeof (settings[type]) === 'object') {
@@ -110,10 +115,12 @@ SOFTWARE.
                     for (var prop in mappings) {
                         if (isArrayLike(mappings[prop])) {
                             var dynamicConstructor = eval(prop + " = function() { }")
+                            dynamicConstructor.prototype = new Entitize();
+                            dynamicConstructor.prototype.constructor = dynamicConstructor;
                             var baseObj = new dynamicConstructor();
                             baseObj.type = prop;
                             baseObj.mappings = mappings;
-                            baseObj.__proto__ = new Entitize();
+                            //baseObj.__proto__ = new Entitize();
                             EntitizeNamespace.types[baseObj.type] = baseObj;
                             EntitizeNamespace.settings[baseObj.type] = baseObj.mappings[baseObj.type];
                         }
