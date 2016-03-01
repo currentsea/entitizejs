@@ -4,6 +4,9 @@ A JavaScript library that helps turn domain models into rich JavaScript objects
 <br />
 <strong>Server</strong>
 ```C#
+/// <summary>
+/// Domain model <c>Foo</c>.
+/// </summary>
 public class Foo
 {
     public int FooId { get; set; }
@@ -11,7 +14,18 @@ public class Foo
     public int Age { get; set; }
     public List<Bar> Bars { get; set; }
 }
+/// <summary>
+/// Controller action to update the <c>Foo</c> object.
+/// </summary>
+/// <param name="foo">The foo to update</param>
+/// <returns>HttpStatusCode.OK</returns>
+[HttpPost]
+public ActionResult UpdateFoo(Foo foo)
+{
+    return new HttpStatusCodeResult(HttpStatusCode.OK);
+}
 ```
+<br />
 <strong>Client</strong>
 ```javascript
 // Serialize the object
@@ -23,10 +37,10 @@ Foo = function() {
     // these are required properties
     this.type = "Foo";
     this.updateUrl = "/FooBarBaz/UpdateFoo";
-    this.mappings = [ {propType:"int", propName:"FooId"},
-                      {propType:"string", propName:"Name"},
-                      {propType:"int", propName:"Age"},
-                      {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"} ];
+    this.mappings = [{propType:"int", propName:"FooId"},
+                     {propType:"string", propName:"Name"},
+                     {propType:"int", propName:"Age"},
+                     {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"}];
     
     // Define a function for all instances of Foo
     this.fooFunc = function() {
