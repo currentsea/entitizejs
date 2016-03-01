@@ -184,114 +184,96 @@ SOFTWARE.
 
 })();
 
-/*  Usage: 
+/*  Usage
+<script type="text/javascript">
 
-<script src="~/Scripts/entitize/entitize.js"></script>
+    var jsFoo = @Html.Raw(JsonConvert.SerializeObject(Model,
+    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
-<script>
+var mappings = {
+    Foo: [{propType:"int", propName:"FooId"},
+            {propType:"string", propName:"Name"},
+            {propType:"int", propName:"Age"},
+            {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"}],
 
-    var jsTable = @Html.Raw(JsonConvert.SerializeObject(Model.Table,
-         new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+    Bar: [{propType:"int", propName:"BarId"},
+            {propType:"int", propName:"BazId"},
+            {propType:"Baz", propName:"Baz", nav:true, relationship:"one-to-one", foreignKey:"BazId", childType:"Baz"},
+            {propType:"string", propName:"Value"}],
 
-    var mappings = {
-        Table : [ {propType:"int", propName:"ID"},
-                    {propType:"string", propName:"RowVersion"},
-                    {propType:"string", propName:"TableName"},
-                    {propType:"Column", propName:"Columns", nav:true, relationship:"one-to-many", childType:"Column"},
-                    {propType:"Column", propName:"SplitBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"Column", propName:"SortBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"Column", propName:"GroupBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"bool", propName:"SortOrder"}],
+    Baz: [{propType:"int", propName:"BazId"},
+            {propType:"string", propName:"BazName"}],
+};
 
-        Column: [{propType:"int", propName:"ID"},
-                    {propType:"string", propName:"RowVersion"},
-                    {propType:"string", propName:"QuestionId"},
-                    {propType:"string", propName:"ColumnName"},
-                    {propType:"Filter", propName:"Filter", nav:true, relationship:"one-to-one", childType:"Filter"},
-                    {propType:"int", propName:"Position"},
-                    {propType:"int", propName:"TableId"},
-                    {propType:"Table", propName:"Table"}],
+Entitize.initialize(mappings);
 
-        Filter: [{propType:"int", propName:"ID"},
-                    {propType:"string", propName:"RowVersion"},
-                    {propType:"string", propName:"FilterQuery"}]};
+var jEntityFoo = Entitize(jsFoo, "Foo");
+console.log(jEntityFoo);
 
-    Entitize.initialize(mappings);
+var fooFuncs = {
+    fooOne: function() { console.log(this) },
+    fooToo: function() { console.log(this) }
+}
 
-    // entitizer
-    var tableEntity = Entitize(jsTable, "Table")
-    console.log(tableEntity)
+var barFuncs = {
+    barOne: function() { console.log(this) },
+    barTwo: function() { console.log(this) }
+}
 
+Entitize.extendType("Foo", fooFuncs);
+Entitize.extendType("Bar", barFuncs);
 
-    //////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// OR ////////////////////////////////// 
 
+var jsFoo2 = @Html.Raw(JsonConvert.SerializeObject(Model,
+    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
-    var jsTable2 = @Html.Raw(JsonConvert.SerializeObject(Model.Table,
-         new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+Foo = function() {
+    this.type = "Foo";
+    this.updateUrl = "/FooBarBaz/UpdateFoo";
+    this.mappings = [ {propType:"int", propName:"FooId"},
+                        {propType:"string", propName:"Name"},
+                        {propType:"int", propName:"Age"},
+                        {propType:"Bar", propName:"Bars", nav:true, relationship:"one-to-many", childType:"Bar"} ];
 
-    TableConstructor = function() {
-        this.type = "Table";
-        this.updateUrl = "/Tables/UpdateTable";
-        this.mappings = [ {propType:"int", propName:"ID"},
-                    {propType:"string", propName:"RowVersion"},
-                    {propType:"string", propName:"TableName"},
-                    {propType:"Column", propName:"Columns", nav:true, relationship:"one-to-many", childType:"Column"},
-                    {propType:"Column", propName:"SplitBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"Column", propName:"SortBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"Column", propName:"GroupBy", nav:true, relationship:"one-to-one", childType:"Column"},
-                    {propType:"bool", propName:"SortOrder"}];
-
-        this.tableFunc = function() {
-            console.log(this);
-        }
+    this.fooFunc = function() {
+        console.log(this);
     }
+}
 
-    ColumnConstructor = function() {
-        this.type = "Column";
-        this.updateUrl = "/Tables/UpdateColumn";
-        this.mappings = [{propType:"int", propName:"ID"},
-                       {propType:"string", propName:"RowVersion"},
-                       {propType:"string", propName:"QuestionId"},
-                       {propType:"string", propName:"ColumnName"},
-                       {propType:"Filter", propName:"Filter", nav:true, relationship:"one-to-one", childType:"Filter"},
-                       {propType:"int", propName:"Position"},
-                       {propType:"int", propName:"TableId"},
-                       {propType:"Table", propName:"Table"}]
+Bar = function() {
+    this.type = "Bar";
+    this.updateUrl = "/FooBarBaz/UpdateBar";
+    this.mappings = [{propType:"int", propName:"BarId"},
+                        {propType:"int", propName:"BazId"},
+                        {propType:"Baz", propName:"Baz", nav:true, relationship:"one-to-one", foreignKey:"BazId", childType:"Baz"},
+                        {propType:"string", propName:"Value"} ];
 
-        this.columnFunc = function() {
-            console.log(this);
-        }
+    this.barFunc = function() {
+        console.log(this);
     }
+}
 
-    FilterConstructor = function() {
-        this.type = "Filter";
-        this.updateUrl = "/Tables/UpdateFilter";
-        this.mappings = [{propType:"int", propName:"ID"},
-                    {propType:"string", propName:"RowVersion"},
-                    {propType:"string", propName:"FilterQuery"}];
+Baz = function() {
+    this.type = "Baz";
+    this.updateUrl = "/FooBarBaz/UpdateBaz";
+    this.mappings = [ {propType:"int", propName:"BazId"},
+                        {propType:"string", propName:"BazName"} ];
+}
 
-        this.filterFunc = function() {
-            console.log(this);
-        }
-    }
+Entitize.initialize(Foo);
+Entitize.initialize(Bar);
+Entitize.initialize(Baz);
 
-    Entitize.initialize(TableConstructor);
-    Entitize.initialize(ColumnConstructor);
-    Entitize.initialize(FilterConstructor);
+var jsEntityFoo2 = Entitize(jsFoo2, "Foo");
+console.log(jsEntityFoo2);
 
-    var moreTableFunctions = {
-        tableFuncAnother : function() {
-            console.log(this);
-        },
-        tableFuncAndAnother: function() {
-            console.log(this);
-        }
-    }
-    Entitize.extendType("Table", moreTableFunctions);
+var barFuncs = {
+    barOne: function() { console.log(this) },
+    barTwo: function() { console.log(this) }
+}
 
-    // entitizer
-    var tableEntity = Entitize(jsTable2, "Table")
-    console.log(tableEntity)
+Entitize.extendType("Bar", barFuncs);
 
 </script>
 */
