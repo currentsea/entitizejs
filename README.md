@@ -35,6 +35,10 @@ public ActionResult UpdateFoo(Foo foo)
 ```
 <br />
 <strong>Client</strong>
+```html
+<!-- include the entitize.js script -->
+<script src="/path/to/entitize.js" type="text/javascript"></script>
+```
 ```javascript
 // Serialize the object
 var jsFoo = @Html.Raw(JsonConvert.SerializeObject(Model,
