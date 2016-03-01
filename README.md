@@ -14,6 +14,7 @@ public class Foo
     public int Age { get; set; }
     public List<Bar> Bars { get; set; }
 }
+
 /// <summary>
 /// Controller action to update the <c>Foo</c> object.
 /// </summary>
@@ -48,7 +49,6 @@ Foo = function() {
     }
 }
 ```
-<strong>entitizejs</strong>
 ```javascript
 // Initialize the constructor with Entitize
 Entitize.initialize(Foo);
