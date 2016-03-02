@@ -168,7 +168,7 @@ SOFTWARE.
                 var navProp = mapping.propName; // propName
                 var relation = mapping.relationship; // nav relationship
                 var childType = mapping.childType; // nav childType
-
+                // check the type of relationship
                 if (relation === "one-to-many") {
                     // one to many, we need to Entitize each object in the relation
                     var relationObjects = newEntity[navProp];
