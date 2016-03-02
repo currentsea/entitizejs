@@ -2,7 +2,7 @@
 A JavaScript library that helps turn domain models into rich JavaScript objects
 <br />
 <br />
-<strong>need to udpate docs</strong>
+##<strong>need to udpate docs</strong>
 <br />
 <br />
 The main function of the library is to map domain model objects from the server, to rich JavaScript objects on the client.
