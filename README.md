@@ -8,7 +8,7 @@ By defining a custom constructor for your object, it is easy to initialize it wi
 In the custom constructor, there are two required properties: type and mappings. Furthermore you can define extra properties and functions here, which are specifically related to that type. (dont worry, you can also extend props and funcs later on at any time...by type or instance)
 <br />
 <br />
-<strong>Server</strong>
+####Server
 ```C#
 /// <summary>
 /// Domain model <c>Foo</c>.
@@ -37,11 +37,13 @@ public ActionResult UpdateFoo(Foo foo)
 }
 ```
 <br />
-<strong>Client</strong>
+####Client
+######Include the entitize.js script
 ```html
 <!-- include the entitize.js script -->
 <script src="/path/to/entitize.js" type="text/javascript"></script>
 ```
+######Define custom constructors
 ```javascript
 // Serialize the object
 var jsFoo = @Html.Raw(JsonConvert.SerializeObject(Model,
@@ -70,14 +72,14 @@ Foo = function() {
         Post("/FooBarBaz/UpdateFoo", JSON.stringify(objToPost));
     }
 }
-
 ...
 // Define constructors for related types (Bar & Baz)
 ...
 ```
+######Initialize with the Entitize framework
 ```javascript
 // Initialize the constructor with Entitize
-Entitize.initialize(Foo);
+Entitize.initialize([Foo, ...]);
 
 // Entitize the serialized object, passing its type
 var jsEntityFoo = Entitize(jsFoo, "Foo");
@@ -85,9 +87,10 @@ console.log(jsEntityFoo2); //=>
 
 jsEntityFoo.fooFunc() //=> calls the function defined in Foo's constructor
 
-jsEntityFoo.entitize() //=> returns the object prepared for the server (as defined in mappings)
+jsEntityFoo.entitize() //=> returns the object in the form as defined in mappings
 jsEntityFoo.save() //=> calls the save function defined in Foo's constructor
 ```
+######Extend more props and functions
 ```javascript
 // Define more functions for Foo type
 var moreFooStuff = {
