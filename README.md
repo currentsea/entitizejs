@@ -30,7 +30,6 @@ public class Foo
 public ActionResult UpdateFoo(Foo foo)
 {
     // Do work with foo
-    
     // Return appropriate response
     return new HttpStatusCodeResult(HttpStatusCode.OK);
 }
@@ -66,8 +65,7 @@ Foo = function() {
     this.save = function() {
         // format the object based on the mappings
         var objToPost = this.entitize();
-        
-        Post("/FooBarBaz/UpdateFoo", JSON.stringify(objToPost));
+        post("/FooBarBaz/UpdateFoo", JSON.stringify(objToPost));
     }
 }
 ...
@@ -83,9 +81,8 @@ Entitize.initialize([Foo, ...]);
 var jsEntityFoo = Entitize(jsFoo, "Foo");
 console.log(jsEntityFoo2); //=> 
 
-jsEntityFoo.fooFunc() //=> calls the function defined in Foo's constructor
-
 jsEntityFoo.entitize() //=> returns the object in the form as defined in mappings
+jsEntityFoo.fooFunc() //=> calls the function defined in Foo's constructor
 jsEntityFoo.save() //=> calls the save function defined in Foo's constructor
 ```
 ######Extend more props and functions
