@@ -7,7 +7,7 @@ The main function of the library is to map domain model objects from the server,
 By defining a custom constructor for your object, it is easy to initialize it with the Entitize framework by calling Entitize.initialize(constructor). This sets up the constructor function that is used for all objects of this type.
 In the custom constructor, there are two required properties: type and mappings. Furthermore you can define extra properties and functions here, which are specifically related to that type. (dont worry, you can also extend props and funcs later on at any time...by type or instance)
 
-<b>Note:</b> After writing this library, I realized this tool can just as easily be utilized by those looking to enrich any JavaScript object, regardless the objects origin; whether it be server, rest api, or some other source of JSON data. You can 'Entitize' just about anything.
+<b>Note:</b> After writing this library, I realized this tool can just as easily be utilized by those looking to enrich any JavaScript object, regardless the objects origin; server, rest api, or some other source of JSON data. You can 'Entitize' just about anything.
 <br />
 ####Server
 ```C#
