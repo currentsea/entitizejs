@@ -145,6 +145,21 @@ SOFTWARE.
     Entitize.extendType = function (entityType, object) {
         Entitize.extend(EntitizeNamespace.types[entityType], object);
     }
+    
+    Entitize.create = function (entityType) {
+        var accumulator = {};
+        var baseObj = EntitizeNamespace.types[entityType];
+        var mappings = baseObj.mappings;
+        for (var i = 0; i < baseObj.mappings.length; i++) {
+            var mapping = baseObj.mappings[i];
+            if (mapping.nav) {
+                accumulator[mapping.propName] = null; //Entitize.create(mapping.childType);
+            } else {
+                accumulator[mapping.propName] = null;
+            }
+        }
+        return Entitize(accumulator, entityType);
+    }
 
     var isArrayLike = function (obj) {
         return obj && typeof obj === "object" && (obj.length === 0 || typeof obj.length === "number" && obj.length > 0 && obj.length - 1 in obj);
