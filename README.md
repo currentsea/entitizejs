@@ -6,8 +6,7 @@ A JavaScript library that helps turn domain models into rich JavaScript objects
 The main function of the library is to map domain model objects from the server, to rich JavaScript objects on the client.
 <b>entitizejs</b> provides an interface to easily define mappings for objects, and relationships between those objects if they exist.
 By defining a custom constructor for your object, it is easy to initialize it with the Entitize framework by calling Entitize.initialize(constructor). This sets up the constructor function that is used for all objects of this type.
-In the custom constructor, there are three required properties: type, updateUrl, and mappings. Furthermore you can define extra properties and functions here, which are specifically related to that type. (dont worry, you can also extend props and funcs later on at any time...by type or instance)
-By defining the updateUrl, it is very easy to persist the object back to the server by calling object.save(). This will post the object to the updateUrl, formatting it based on the mappings defined for that object. (it will only take those properties defined)
+In the custom constructor, there are two required properties: type and mappings. Furthermore you can define extra properties and functions here, which are specifically related to that type. (dont worry, you can also extend props and funcs later on at any time...by type or instance)
 <br />
 <br />
 <strong>Server</strong>
@@ -53,7 +52,6 @@ var jsFoo = @Html.Raw(JsonConvert.SerializeObject(Model,
 Foo = function() {
     // these are required properties
     this.type = "Foo";
-    this.updateUrl = "/FooBarBaz/UpdateFoo";
     this.mappings = [{propType:"int", propName:"FooId"},
                      {propType:"string", propName:"Name"},
                      {propType:"int", propName:"Age"},
@@ -63,6 +61,14 @@ Foo = function() {
     // Define a function for all instances of Foo
     this.fooFunc = function() {
         console.log(this);
+    }
+    
+    // Define another!
+    this.save = function() {
+        // format the object based on the mappings
+        var objToPost = this.entitize();
+        
+        Post("/FooBarBaz/UpdateFoo", JSON.stringify(objToPost));
     }
 }
 
@@ -81,19 +87,27 @@ console.log(jsEntityFoo2); //=>
 jsEntityFoo.fooFunc() //=> calls the function defined in Foo's constructor
 
 jsEntityFoo.entitize() //=> returns the object prepared for the server (as defined in mappings)
-jsEntityFoo.save() //=> calls entitize() on the object, and posts it to obj.updateUrl
+jsEntityFoo.save() //=> calls the save function defined in Foo's constructor
 ```
 ```javascript
 // Define more functions for Foo type
 var moreFooStuff = {
     fooOne: function() { console.log(this) },
     fooToo: function() { console.log(this) },
-    fooPropOne: "Kung-Foo!"
 }
+// Define more props for a specific Foo
+var moreFooProps = { fooPropOne: "Kung-Foo!" }
 
 // Extend the 'moreFooStuff' into the type 'Foo'
 Entitize.extendType("Foo", moreFooStuff);
 
 // Entend the 'moreFooStuff' into the object 'jsEntityFoo'
-Entitize.extend(jsEntityFoo, moreFooStuff);
+Entitize.extend(jsEntityFoo, moreFooProps);
+
+jsEntityFoo.fooOne(); //=> 
+otherFooEntity.fooTwo(); //=> 
+
+console.log(jsEntityFoo.fooPropOne); //=> "Kung-Foo!"
+console.log(otherFooEntity.fooPropOne); //=> undefined
+
 ```
