@@ -113,17 +113,15 @@ SOFTWARE.
                 } else if (typeof (settings[type]) === 'object') {
                     var mappings = settings[type];
                     for (var prop in mappings) {
-                        if (isArrayLike(mappings[prop])) {
-                            var dynamicConstructor = eval(prop + " = function() { }")
-                            dynamicConstructor.prototype = new Entitize();
-                            dynamicConstructor.prototype.constructor = dynamicConstructor;
-                            var baseObj = new dynamicConstructor();
-                            baseObj.type = prop;
-                            baseObj.mappings = mappings;
-                            //baseObj.__proto__ = new Entitize();
-                            EntitizeNamespace.types[baseObj.type] = baseObj;
-                            EntitizeNamespace.settings[baseObj.type] = baseObj.mappings[baseObj.type];
-                        }
+                        var dynamicConstructor = eval(prop + " = function() { }")
+                        dynamicConstructor.prototype = new Entitize();
+                        dynamicConstructor.prototype.constructor = dynamicConstructor;
+                        var baseObj = new dynamicConstructor();
+                        baseObj.type = prop;
+                        baseObj.mappings = mappings;
+                        //baseObj.__proto__ = new Entitize();
+                        EntitizeNamespace.types[baseObj.type] = baseObj;
+                        EntitizeNamespace.settings[baseObj.type] = baseObj.mappings[baseObj.type];
                     }
                 }
             }
@@ -158,6 +156,8 @@ SOFTWARE.
     JEntity = function (jsObject, entityType) {
         var mappings = EntitizeNamespace.settings[entityType];
         this.entityType = entityType;
+        var newEntity = {};
+        Entitize.extend(newEntity, jsObject);
 
         // first try to configure all of the mappings
         for (var i = 0; i < mappings.length; i++) {
@@ -171,27 +171,29 @@ SOFTWARE.
 
                 if (relation === "one-to-many") {
                     // one to many, we need to Entitize each object in the relation
-                    var relationObjects = jsObject[navProp];
-                    jsObject[navProp] = []; // we will be adding to jsObject[navProp]
+                    var relationObjects = newEntity[navProp];
+                    newEntity[navProp] = []; // we will be adding to jsObject[navProp]
                     for (var obj in relationObjects) {
                         var entitizeMe = relationObjects[obj];
                         var entitized = Entitize(entitizeMe, childType)
-                        jsObject[navProp].push(entitized);
+                        newEntity[navProp].push(entitized);
                     }
                 } else if (relation === "one-to-one") {
                     // one to one relation, Entitize the object
-                    var entitizeMe = jsObject[navProp];
+                    var entitizeMe = newEntity[navProp];
                     var entitized = Entitize(entitizeMe, childType);
-                    jsObject[navProp] = entitized;
+                    newEntity[navProp] = entitized;
                 }
             }
         }
 
         // extend all of the properties in the jsObject, including the newly created
         // relation JEntity objects
-        Entitize.extend(this, jsObject);
+        Entitize.extend(this, newEntity);
 
         // set the proto to the base object as all other types
         this.__proto__ = EntitizeNamespace.types[this.entityType];
     }
+
 })();
+
