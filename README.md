@@ -7,7 +7,6 @@ The main function of the library is to map domain model objects from the server,
 By defining a custom constructor for your object, it is easy to initialize it with the Entitize framework by calling Entitize.initialize(constructor). This sets up the constructor function that is used for all objects of this type.
 In the custom constructor, there are two required properties: type and mappings. Furthermore you can define extra properties and functions here, which are specifically related to that type. (dont worry, you can also extend props and funcs later on at any time...by type or instance)
 <br />
-<br />
 ####Server
 ```C#
 /// <summary>
@@ -36,7 +35,6 @@ public ActionResult UpdateFoo(Foo foo)
     return new HttpStatusCodeResult(HttpStatusCode.OK);
 }
 ```
-<br />
 ####Client
 ######Include the entitize.js script
 ```html
