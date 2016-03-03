@@ -147,6 +147,7 @@ SOFTWARE.
     }
     
     Entitize.create = function (entityType) {
+        if (!entityType) return {};
         var accumulator = {};
         var baseObj = EntitizeNamespace.types[entityType];
         var mappings = baseObj.mappings;
