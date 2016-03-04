@@ -33,8 +33,15 @@ SOFTWARE.
     Entitize = function (jsObject, entitytype) {
 
         if (jsObject && entitytype) {
-            var jEntity = new JEntity(jsObject, entitytype);
-            return jEntity;
+            // was necessary to set prototype of newly created objects
+            // mutating the [[Prototype]] of an object will cause your code to run very slowly, Firefox 44.0.2
+            // before, was setting __proto__ in the JEntity constructor
+            function Entity() { } 
+            Entity.prototype = EntitizeNamespace.types[entitytype];
+            Entity.prototype.constructor = Entity;
+            var anon = new Entity();
+            JEntity.call(anon, jsObject, entitytype)
+            return anon;
         }
 
         this.entitize = function () {
@@ -126,6 +133,7 @@ SOFTWARE.
                 }
             }
         }
+
         return EntitizeNamespace;
     }
 
@@ -145,7 +153,7 @@ SOFTWARE.
     Entitize.extendType = function (entityType, object) {
         Entitize.extend(EntitizeNamespace.types[entityType], object);
     }
-    
+
     Entitize.create = function (entityType) {
         if (!entityType || entityType === "Entitize") return new Entitize();
         var accumulator = {};
@@ -207,9 +215,9 @@ SOFTWARE.
         // relation JEntity objects
         Entitize.extend(this, newEntity);
 
+        // now done in Entitize...
         // set the proto to the base object as all other types
-        this.__proto__ = EntitizeNamespace.types[this.entityType];
+        //this.__proto__ = EntitizeNamespace.types[this.entityType]; 
     }
 
 })();
-
